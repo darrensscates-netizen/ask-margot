@@ -36,7 +36,7 @@
       --shadow-deep: rgba(61,34,16,0.3);
       --radius:      20px;
       --radius-sm:   12px;
-      --nav-height:  64px;
+      --nav-height:  52px;
     }
 
     html, body { height: 100%; font-family: 'Nunito', sans-serif; background: var(--cream); color: var(--text-dark); overflow: hidden; }
@@ -50,18 +50,13 @@
       padding-top: max(32px, env(safe-area-inset-top));
     }
     #pin-screen.hidden { display: none; }
-
     .pin-dog { width: 88px; height: 88px; margin-bottom: 14px; }
-
     .pin-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--white); margin-bottom: 6px; }
     .pin-subtitle { font-size: 14px; color: var(--brown-pale); margin-bottom: 34px; text-align: center; line-height: 1.5; }
-
     .pin-dots { display: flex; gap: 16px; margin-bottom: 30px; }
     .pin-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--brown-pale); transition: all 0.15s; }
     .pin-dot.filled { background: var(--gold-light); border-color: var(--gold-light); transform: scale(1.15); }
-
     .pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 280px; }
-
     .pin-btn {
       height: 68px; border-radius: var(--radius-sm);
       border: 2px solid rgba(255,255,255,0.15);
@@ -74,7 +69,6 @@
     .pin-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.94); }
     .pin-btn.pin-clear { font-size: 13px; font-weight: 700; color: var(--brown-pale); }
     .pin-btn.pin-del { font-size: 20px; }
-
     .pin-error { margin-top: 18px; color: #FF9999; font-size: 14px; font-weight: 600; min-height: 20px; animation: shake 0.35s ease; }
     @keyframes shake { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-8px); } 60% { transform:translateX(8px); } }
 
@@ -100,6 +94,32 @@
     .btn-lock { background: none; border: none; cursor: pointer; font-size: 17px; color: var(--brown-pale); padding: 4px; transition: opacity 0.2s; }
     .btn-lock:hover { opacity: 0.7; }
 
+    /* ── TOP NAV (moved from bottom) ──────────────────────────── */
+    #top-nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--brown-pale);
+      display: flex; align-items: stretch; flex-shrink: 0;
+      height: var(--nav-height);
+      box-shadow: 0 2px 8px var(--shadow);
+      position: relative; z-index: 9;
+    }
+    .nav-btn {
+      flex: 1; border: none; background: none; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px; color: var(--text-light);
+      font-family: 'Nunito', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.2px; padding: 6px 4px; position: relative;
+      transition: color 0.2s; -webkit-tap-highlight-color: transparent;
+    }
+    .nav-icon { font-size: 19px; transition: transform 0.2s; }
+    .nav-btn.active { color: var(--brown-mid); }
+    .nav-btn.active .nav-icon { transform: translateY(-1px); }
+    .nav-btn.active::after {
+      content: ''; position: absolute; bottom: 0; left: 50%;
+      transform: translateX(-50%); width: 30px; height: 3px;
+      background: var(--brown-mid); border-radius: 3px 3px 0 0;
+    }
+
     /* ── PAGES ────────────────────────────────────────────────── */
     .page { display: none; flex: 1; flex-direction: column; overflow: hidden; min-height: 0; }
     .page.active { display: flex; }
@@ -108,14 +128,12 @@
     #chat { flex: 1; overflow-y: auto; padding: 14px 13px; display: flex; flex-direction: column; gap: 11px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
     #chat::-webkit-scrollbar { width: 3px; }
     #chat::-webkit-scrollbar-thumb { background: var(--brown-pale); border-radius: 3px; }
-
     .welcome-card { background: linear-gradient(135deg, var(--brown-mid), var(--brown-warm)); border-radius: var(--radius); padding: 16px 15px; color: var(--white); box-shadow: 0 6px 24px var(--shadow-deep); animation: slideIn 0.4s ease; }
     .welcome-card h2 { font-family: 'Playfair Display', serif; font-size: 17px; margin-bottom: 5px; }
     .welcome-card p { font-size: 13px; line-height: 1.55; color: var(--brown-pale); }
     .welcome-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
     .chip { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: var(--white); font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 20px; cursor: pointer; transition: all 0.2s; font-family: 'Nunito', sans-serif; }
     .chip:hover, .chip:active { background: rgba(255,255,255,0.28); }
-
     .msg { display: flex; gap: 7px; animation: slideIn 0.3s ease; }
     .msg.user { flex-direction: row-reverse; }
     @keyframes slideIn { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }
@@ -125,17 +143,15 @@
     .msg-bubble { max-width: calc(100% - 40px); padding: 9px 13px; border-radius: var(--radius); font-size: 14px; line-height: 1.58; font-weight: 500; }
     .msg.bot .msg-bubble { background: var(--white); color: var(--text-dark); border-radius: 4px var(--radius) var(--radius) var(--radius); box-shadow: 0 2px 10px var(--shadow); }
     .msg.user .msg-bubble { background: linear-gradient(135deg, var(--brown-mid), var(--brown-warm)); color: var(--white); border-radius: var(--radius) 4px var(--radius) var(--radius); }
-
     .typing { display: flex; align-items: center; gap: 5px; padding: 11px 13px; }
     .typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--brown-light); animation: bounce 1.2s ease-in-out infinite; }
     .typing span:nth-child(2) { animation-delay: 0.2s; }
     .typing span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes bounce { 0%,60%,100% { transform:translateY(0); } 30% { transform:translateY(-6px); } }
-
     .error-msg { background: #FFF0F0; border: 1px solid #FFCCCC; color: #C00; border-radius: var(--radius-sm); padding: 9px 13px; font-size: 13px; text-align: center; }
 
     /* ── INPUT ────────────────────────────────────────────────── */
-    #input-area { padding: 9px 13px 11px; background: var(--cream-dark); border-top: 1px solid var(--brown-pale); flex-shrink: 0; }
+    #input-area { padding: 9px 13px 11px; padding-bottom: max(11px, env(safe-area-inset-bottom)); background: var(--cream-dark); border-top: 1px solid var(--brown-pale); flex-shrink: 0; }
     .input-row { display: flex; gap: 8px; align-items: flex-end; }
     #question-input { flex: 1; min-height: 42px; max-height: 108px; padding: 9px 13px; border: 2px solid var(--brown-pale); border-radius: 21px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 500; color: var(--text-dark); background: var(--white); outline: none; resize: none; transition: border-color 0.2s; line-height: 1.4; }
     #question-input:focus { border-color: var(--brown-warm); box-shadow: 0 0 0 3px rgba(139,94,60,0.12); }
@@ -181,30 +197,41 @@
     .btn-wa { background: #E8F5E8; }
     .btn-call:hover, .btn-wa:hover { transform: scale(1.12); }
 
-    /* ── BOTTOM NAV ───────────────────────────────────────────── */
-    #bottom-nav {
-      height: var(--nav-height);
-      padding-bottom: max(0px, env(safe-area-inset-bottom));
-      background: var(--white); border-top: 1px solid var(--brown-pale);
-      display: flex; align-items: stretch; flex-shrink: 0;
-      box-shadow: 0 -3px 14px var(--shadow);
+    /* ── INSTALL MODAL ────────────────────────────────────────── */
+    #install-modal {
+      display: none; position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,0.5); align-items: flex-end; justify-content: center;
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
     }
-    .nav-btn {
-      flex: 1; border: none; background: none; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 3px; color: var(--text-light);
-      font-family: 'Nunito', sans-serif; font-size: 10px; font-weight: 700;
-      letter-spacing: 0.2px; padding: 6px 4px; position: relative;
-      transition: color 0.2s; -webkit-tap-highlight-color: transparent;
+    #install-modal.show { display: flex; }
+    .install-sheet {
+      background: var(--white); border-radius: 20px 20px 16px 16px;
+      width: 100%; max-width: 500px; padding: 20px 20px 24px;
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.25);
+      animation: slideUp 0.3s ease;
     }
-    .nav-icon { font-size: 21px; transition: transform 0.2s; }
-    .nav-btn.active { color: var(--brown-mid); }
-    .nav-btn.active .nav-icon { transform: translateY(-2px); }
-    .nav-btn.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 30px; height: 3px; background: var(--brown-mid); border-radius: 3px 3px 0 0; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .install-sheet h3 { font-family: 'Playfair Display', serif; font-size: 19px; color: var(--brown-dark); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .install-sheet p { font-size: 13px; color: var(--text-light); line-height: 1.55; margin-bottom: 16px; }
+    .install-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .install-step { display: flex; align-items: center; gap: 12px; background: var(--cream); border-radius: var(--radius-sm); padding: 10px 12px; }
+    .install-step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--brown-mid); color: var(--white); font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .install-step-text { font-size: 13px; color: var(--text-dark); font-weight: 600; line-height: 1.4; }
+    .install-step-text span { color: var(--brown-warm); }
+    .install-arrow { font-size: 22px; }
+    .btn-install-close { width: 100%; padding: 13px; border: none; border-radius: var(--radius-sm); background: var(--brown-mid); color: var(--white); font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .btn-install-android { width: 100%; padding: 13px; border: none; border-radius: var(--radius-sm); background: var(--brown-mid); color: var(--white); font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+    .btn-install-dismiss { width: 100%; padding: 10px; border: none; border-radius: var(--radius-sm); background: var(--cream-dark); color: var(--text-light); font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
 
-    /* ── INSTALL BANNER ───────────────────────────────────────── */
-    #install-banner { display: none; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--brown-dark); padding: 8px 16px; font-size: 13px; font-weight: 700; text-align: center; cursor: pointer; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0; }
-    #install-banner.show { display: flex; }
+    /* ── INSTALL BUTTON in header ─────────────────────────────── */
+    .btn-install {
+      background: var(--gold); border: none; border-radius: 14px;
+      color: var(--white); font-family: 'Nunito', sans-serif;
+      font-size: 11px; font-weight: 800; padding: 5px 10px;
+      cursor: pointer; transition: opacity 0.2s; white-space: nowrap;
+      display: none;
+    }
+    .btn-install.show { display: block; }
   </style>
 </head>
 <body>
@@ -229,17 +256,14 @@
     <circle cx="256" cy="299" r="14" fill="#F0C060"/>
     <text x="256" y="305" text-anchor="middle" font-size="14" font-weight="bold" fill="#5C3D1E" font-family="Arial">M</text>
   </svg>
-
   <h1 class="pin-title">Ask Margot</h1>
   <p class="pin-subtitle">Enter your PIN to access<br>the house guide</p>
-
   <div class="pin-dots">
     <div class="pin-dot" id="dot-0"></div>
     <div class="pin-dot" id="dot-1"></div>
     <div class="pin-dot" id="dot-2"></div>
     <div class="pin-dot" id="dot-3"></div>
   </div>
-
   <div class="pin-pad">
     <button class="pin-btn" onclick="pinPress('1')">1</button>
     <button class="pin-btn" onclick="pinPress('2')">2</button>
@@ -252,10 +276,16 @@
     <button class="pin-btn" onclick="pinPress('9')">9</button>
     <button class="pin-btn pin-clear" onclick="pinClear()">Clear</button>
     <button class="pin-btn" onclick="pinPress('0')">0</button>
-    <button class="pin-btn pin-del" onclick="pinDelete()">⌫</button>
+    <button class="pin-btn pin-del" onclick="pinDelete()">&#x232B;</button>
   </div>
-
   <div class="pin-error" id="pin-error"></div>
+</div>
+
+<!-- ── INSTALL MODAL ───────────────────────────────────────────────────────── -->
+<div id="install-modal">
+  <div class="install-sheet" id="install-sheet-content">
+    <!-- Content injected by JS depending on iOS vs Android -->
+  </div>
 </div>
 
 <!-- ── MAIN APP ────────────────────────────────────────────────────────────── -->
@@ -283,35 +313,47 @@
       <p>House &amp; dog guide</p>
     </div>
     <div class="header-right">
+      <button class="btn-install" id="install-btn" onclick="showInstallModal()">&#xFF0B; Add to phone</button>
       <div class="status-pill">
         <div class="status-dot" id="status-dot"></div>
         <span id="status-text">Ready</span>
       </div>
-      <button class="btn-lock" onclick="lockApp()" title="Lock app">🔒</button>
+      <button class="btn-lock" onclick="lockApp()" title="Lock app">&#x1F512;</button>
     </div>
   </header>
 
-  <div id="install-banner" onclick="installApp()">🐾 Add to home screen for quick access</div>
+  <!-- TOP NAV -->
+  <nav id="top-nav">
+    <button class="nav-btn active" id="nav-chat" onclick="showPage('chat')">
+      <span class="nav-icon">&#x1F4AC;</span>Ask
+    </button>
+    <button class="nav-btn" id="nav-rota" onclick="showPage('rota')">
+      <span class="nav-icon">&#x1F5D3;&#xFE0F;</span>Rota
+    </button>
+    <button class="nav-btn" id="nav-contacts" onclick="showPage('contacts')">
+      <span class="nav-icon">&#x1F4DE;</span>Contacts
+    </button>
+  </nav>
 
   <!-- CHAT PAGE -->
   <div class="page active" id="page-chat-wrap">
     <div id="chat">
       <div class="welcome-card">
-        <h2>👋 Hi there!</h2>
-        <p>Ask me anything about Margot or the house. Or tap Rota and Contacts below for instant access.</p>
+        <h2>&#x1F44B; Hi there!</h2>
+        <p>Ask me anything about Margot or the house. Or tap Rota and Contacts above for instant access.</p>
         <div class="welcome-chips">
-          <button class="chip" onclick="ask('How much does Margot eat?')">🐾 Feeding</button>
-          <button class="chip" onclick="ask('What is the vet number?')">🏥 Vet</button>
-          <button class="chip" onclick="ask('When does the bin go out?')">🗑️ Bins</button>
-          <button class="chip" onclick="ask('How do I use the dishwasher?')">🍽️ Dishwasher</button>
-          <button class="chip" onclick="ask('How do I put the harness on?')">🎽 Harness</button>
-          <button class="chip" onclick="ask('What is dangerous for Margot?')">⚠️ Dangers</button>
+          <button class="chip" onclick="ask('How much does Margot eat?')">&#x1F43E; Feeding</button>
+          <button class="chip" onclick="ask('What is the vet number?')">&#x1F3E5; Vet</button>
+          <button class="chip" onclick="ask('When does the bin go out?')">&#x1F5D1;&#xFE0F; Bins</button>
+          <button class="chip" onclick="ask('How do I use the dishwasher?')">&#x1F37D;&#xFE0F; Dishwasher</button>
+          <button class="chip" onclick="ask('How do I put the harness on?')">&#x1F455; Harness</button>
+          <button class="chip" onclick="ask('What is dangerous for Margot?')">&#x26A0;&#xFE0F; Dangers</button>
         </div>
       </div>
     </div>
     <div id="input-area">
       <div class="input-row">
-        <button class="btn-mic" id="mic-btn" onclick="toggleMic()" title="Speak your question">🎤</button>
+        <button class="btn-mic" id="mic-btn" onclick="toggleMic()" title="Speak your question">&#x1F3A4;</button>
         <textarea id="question-input" placeholder="Ask anything about Margot or the house…"
           rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
         <button class="btn-send" id="send-btn" onclick="sendQuestion()">
@@ -326,7 +368,7 @@
   <!-- ROTA PAGE -->
   <div class="page" id="page-rota-wrap">
     <div id="page-rota">
-      <div class="page-title">🗓️ Margot's Rota</div>
+      <div class="page-title">&#x1F5D3;&#xFE0F; Margot's Rota</div>
       <table class="rota-table">
         <thead>
           <tr><th>Day &amp; Date</th><th>Daytime</th><th>Walker</th></tr>
@@ -339,136 +381,205 @@
   <!-- CONTACTS PAGE -->
   <div class="page" id="page-contacts-wrap">
     <div id="page-contacts">
-      <div class="page-title">📞 Contacts</div>
+      <div class="page-title">&#x1F4DE; Contacts</div>
 
       <div class="contact-group-title">Owners</div>
-
       <div class="contact-card">
-        <div class="contact-avatar" style="background:#FFF0E0">👩</div>
+        <div class="contact-avatar" style="background:#FFF0E0">&#x1F469;</div>
         <div class="contact-info">
           <div class="contact-name">Caroline</div>
           <div class="contact-role">Owner — WhatsApp preferred</div>
           <div class="contact-number">07976 616359</div>
         </div>
         <div class="contact-actions">
-          <a class="btn-call" href="tel:07976616359" title="Call">📞</a>
-          <a class="btn-wa" href="https://wa.me/447976616359" target="_blank" title="WhatsApp">💬</a>
+          <a class="btn-call" href="tel:07976616359" title="Call">&#x1F4DE;</a>
+          <a class="btn-wa" href="https://wa.me/447976616359" target="_blank" title="WhatsApp">&#x1F4AC;</a>
         </div>
       </div>
-
       <div class="contact-card">
-        <div class="contact-avatar" style="background:#E8F0FF">👨</div>
+        <div class="contact-avatar" style="background:#E8F0FF">&#x1F468;</div>
         <div class="contact-info">
           <div class="contact-name">Darren</div>
           <div class="contact-role">Owner — WhatsApp preferred</div>
           <div class="contact-number">07980 224060</div>
         </div>
         <div class="contact-actions">
-          <a class="btn-call" href="tel:07980224060" title="Call">📞</a>
-          <a class="btn-wa" href="https://wa.me/447980224060" target="_blank" title="WhatsApp">💬</a>
+          <a class="btn-call" href="tel:07980224060" title="Call">&#x1F4DE;</a>
+          <a class="btn-wa" href="https://wa.me/447980224060" target="_blank" title="WhatsApp">&#x1F4AC;</a>
         </div>
       </div>
 
       <div class="contact-group-title">Dog Walkers</div>
-
       <div class="contact-card">
-        <div class="contact-avatar" style="background:#E8F5E8">🦮</div>
+        <div class="contact-avatar" style="background:#E8F5E8">&#x1F9AE;</div>
         <div class="contact-info">
           <div class="contact-name">Claire</div>
           <div class="contact-role">Dog walker</div>
           <div class="contact-number">07956 395443</div>
         </div>
         <div class="contact-actions">
-          <a class="btn-call" href="tel:07956395443" title="Call">📞</a>
+          <a class="btn-call" href="tel:07956395443" title="Call">&#x1F4DE;</a>
         </div>
       </div>
-
       <div class="contact-card">
-        <div class="contact-avatar" style="background:#E8F5E8">🦮</div>
+        <div class="contact-avatar" style="background:#E8F5E8">&#x1F9AE;</div>
         <div class="contact-info">
           <div class="contact-name">Steve</div>
           <div class="contact-role">Dog walker</div>
           <div class="contact-number">07956 560222</div>
         </div>
         <div class="contact-actions">
-          <a class="btn-call" href="tel:07956560222" title="Call">📞</a>
+          <a class="btn-call" href="tel:07956560222" title="Call">&#x1F4DE;</a>
         </div>
       </div>
 
       <div class="contact-group-title">Neighbours</div>
-
       <div class="contact-card">
-        <div class="contact-avatar" style="background:#F0E8FF">🏠</div>
+        <div class="contact-avatar" style="background:#F0E8FF">&#x1F3E0;</div>
         <div class="contact-info">
           <div class="contact-name">Howard</div>
           <div class="contact-role">Next door — number 60</div>
           <div class="contact-number">07855 777584</div>
         </div>
         <div class="contact-actions">
-          <a class="btn-call" href="tel:07855777584" title="Call">📞</a>
+          <a class="btn-call" href="tel:07855777584" title="Call">&#x1F4DE;</a>
         </div>
       </div>
-
       <div class="contact-card">
-        <div class="contact-avatar" style="background:#F0E8FF">🏠</div>
+        <div class="contact-avatar" style="background:#F0E8FF">&#x1F3E0;</div>
         <div class="contact-info">
           <div class="contact-name">Rosemarie</div>
           <div class="contact-role">Nearby — 1 mile away</div>
           <div class="contact-number">07745 130360</div>
         </div>
         <div class="contact-actions">
-          <a class="btn-call" href="tel:07745130360" title="Call">📞</a>
+          <a class="btn-call" href="tel:07745130360" title="Call">&#x1F4DE;</a>
         </div>
       </div>
 
       <div class="contact-group-title">Vet</div>
-
       <div class="contact-card">
-        <div class="contact-avatar" style="background:#FFE8E8">🏥</div>
+        <div class="contact-avatar" style="background:#FFE8E8">&#x1F3E5;</div>
         <div class="contact-info">
           <div class="contact-name">Forest Vets</div>
           <div class="contact-role">76 Hemnal Street, Epping</div>
           <div class="contact-number">01992 575790</div>
         </div>
         <div class="contact-actions">
-          <a class="btn-call" href="tel:01992575790" title="Call">📞</a>
+          <a class="btn-call" href="tel:01992575790" title="Call">&#x1F4DE;</a>
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- BOTTOM NAV -->
-  <nav id="bottom-nav">
-    <button class="nav-btn active" id="nav-chat" onclick="showPage('chat')">
-      <span class="nav-icon">💬</span>Ask
-    </button>
-    <button class="nav-btn" id="nav-rota" onclick="showPage('rota')">
-      <span class="nav-icon">🗓️</span>Rota
-    </button>
-    <button class="nav-btn" id="nav-contacts" onclick="showPage('contacts')">
-      <span class="nav-icon">📞</span>Contacts
-    </button>
-  </nav>
-
 </div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
-// CONFIG — edit these values
+// CONFIG
 // ═══════════════════════════════════════════════════════════════════════════
+const WORKER_URL    = 'https://margot-worker.darrensscates.workers.dev';
+const VALID_PINS    = ['5826'];
+const SESSION_MINUTES = 480;
 
-// Your Cloudflare Worker URL (set after deploying the worker)
-const WORKER_URL = 'https://margot-worker.darrensscates.workers.dev';
+// ═══════════════════════════════════════════════════════════════════════════
+// INSTALL PROMPT
+// ═══════════════════════════════════════════════════════════════════════════
+const isIOS     = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isAndroid = /android/i.test(navigator.userAgent);
+const isInApp   = window.matchMedia('(display-mode: standalone)').matches
+                  || window.navigator.standalone === true;
 
-// Valid PINs — add as many as you like, one per house sitter if you want
-// Each person can have their own PIN, or everyone shares one
-const VALID_PINS = ['5826'];
+let deferredPrompt = null;
 
-// Session length in minutes before PIN is required again
-const SESSION_MINUTES = 480; // 8 hours
+// Android: capture the native install event
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!isInApp) showInstallButton();
+});
 
-// Rota is loaded from rota.json — edit that file instead of this one
+function showInstallButton() {
+  document.getElementById('install-btn').classList.add('show');
+}
+
+function showInstallModal() {
+  const sheet = document.getElementById('install-sheet-content');
+
+  if (isIOS) {
+    // iOS: can't automate — show clear step-by-step instructions
+    sheet.innerHTML = `
+      <h3>&#x1F4F1; Add to Home Screen</h3>
+      <p>Follow these three steps in Safari to save Ask Margot as an app on your iPhone:</p>
+      <div class="install-steps">
+        <div class="install-step">
+          <div class="install-step-num">1</div>
+          <div class="install-step-text">Tap the <span>Share button</span> at the bottom of Safari &#x2014; it looks like a box with an arrow pointing up &#x2B06;</div>
+        </div>
+        <div class="install-step">
+          <div class="install-step-num">2</div>
+          <div class="install-step-text">Scroll down in the menu and tap <span>&#x201C;Add to Home Screen&#x201D;</span></div>
+        </div>
+        <div class="install-step">
+          <div class="install-step-num">3</div>
+          <div class="install-step-text">Tap <span>&#x201C;Add&#x201D;</span> in the top right &#x2014; the Margot icon will appear on your home screen</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:#aaa;margin-bottom:14px">&#x26A0;&#xFE0F; This only works in Safari. If you are using Chrome or another browser, open this page in Safari first.</p>
+      <button class="btn-install-close" onclick="closeInstallModal()">Got it</button>
+    `;
+  } else if (deferredPrompt) {
+    // Android with native prompt available — just trigger it
+    closeInstallModal();
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('install-btn').classList.remove('show');
+    });
+    return;
+  } else {
+    // Android fallback (Chrome without prompt, or other browser)
+    sheet.innerHTML = `
+      <h3>&#x1F4F1; Add to Home Screen</h3>
+      <p>Save Ask Margot as an app on your Android phone:</p>
+      <div class="install-steps">
+        <div class="install-step">
+          <div class="install-step-num">1</div>
+          <div class="install-step-text">Tap the <span>three-dot menu</span> (&#x22EE;) in the top right of Chrome</div>
+        </div>
+        <div class="install-step">
+          <div class="install-step-num">2</div>
+          <div class="install-step-text">Tap <span>&#x201C;Add to Home screen&#x201D;</span></div>
+        </div>
+        <div class="install-step">
+          <div class="install-step-num">3</div>
+          <div class="install-step-text">Tap <span>&#x201C;Add&#x201D;</span> to confirm</div>
+        </div>
+      </div>
+      <button class="btn-install-close" onclick="closeInstallModal()">Got it</button>
+    `;
+  }
+
+  document.getElementById('install-modal').classList.add('show');
+}
+
+function closeInstallModal() {
+  document.getElementById('install-modal').classList.remove('show');
+}
+
+// Close modal when tapping outside the sheet
+document.getElementById('install-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('install-modal')) closeInstallModal();
+});
+
+// Show install button automatically on first visit (not already installed)
+window.addEventListener('load', () => {
+  if (!isInApp) {
+    if (isIOS) showInstallButton();
+    // Android shows button via beforeinstallprompt event above
+  }
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PIN LOGIC
@@ -482,32 +593,26 @@ function checkSession() {
     return s && Date.now() < s.expires;
   } catch { return false; }
 }
-
 function saveSession() {
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({ expires: Date.now() + SESSION_MINUTES * 60000 }));
 }
-
 function lockApp() {
   sessionStorage.removeItem(SESSION_KEY);
   pinBuffer = ''; updateDots();
   document.getElementById('pin-error').textContent = '';
   document.getElementById('pin-screen').classList.remove('hidden');
 }
-
 function pinPress(d) {
   if (pinBuffer.length >= 4) return;
   pinBuffer += d; updateDots();
   if (pinBuffer.length === 4) setTimeout(checkPin, 120);
 }
-
 function pinDelete() { pinBuffer = pinBuffer.slice(0,-1); updateDots(); document.getElementById('pin-error').textContent = ''; }
 function pinClear()  { pinBuffer = ''; updateDots(); document.getElementById('pin-error').textContent = ''; }
-
 function updateDots() {
   for (let i = 0; i < 4; i++)
     document.getElementById('dot-' + i).classList.toggle('filled', i < pinBuffer.length);
 }
-
 function checkPin() {
   if (VALID_PINS.includes(pinBuffer)) {
     saveSession();
@@ -519,8 +624,6 @@ function checkPin() {
     pinBuffer = ''; updateDots();
   }
 }
-
-// Keyboard support
 document.addEventListener('keydown', e => {
   if (document.getElementById('pin-screen').classList.contains('hidden')) return;
   if (e.key >= '0' && e.key <= '9') pinPress(e.key);
@@ -559,12 +662,10 @@ function renderRota(rows) {
   const todayRow = tbody.querySelector('tr.today');
   if (todayRow) setTimeout(() => todayRow.scrollIntoView({ block:'center', behavior:'smooth' }), 200);
 }
-
 function rotaError() {
   document.getElementById('rota-body').innerHTML =
     '<tr><td colspan="3" style="text-align:center;padding:20px;color:#8B7355">Could not load rota. Please check rota.json.</td></tr>';
 }
-
 async function loadRota() {
   try {
     const res = await fetch('rota.json');
@@ -586,29 +687,24 @@ function setStatus(t, ok=true) {
   document.getElementById('status-text').textContent = t;
   document.getElementById('status-dot').className = 'status-dot' + (ok ? '' : ' offline');
 }
-
 function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,108)+'px'; }
-
 function scrollBottom() { setTimeout(()=>document.getElementById('chat').scrollTo({top:99999,behavior:'smooth'}),50); }
-
 function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function addMsg(role, text) {
   const chat = document.getElementById('chat');
   const d = document.createElement('div');
   d.className = `msg ${role}`;
-  d.innerHTML = `<div class="msg-avatar">${role==='bot'?'🐾':'👤'}</div><div class="msg-bubble">${esc(text)}</div>`;
+  d.innerHTML = `<div class="msg-avatar">${role==='bot'?'&#x1F43E;':'&#x1F464;'}</div><div class="msg-bubble">${esc(text)}</div>`;
   chat.appendChild(d); scrollBottom();
 }
-
 function showTyping() {
   const chat = document.getElementById('chat');
   const d = document.createElement('div');
   d.className='msg bot'; d.id='typing';
-  d.innerHTML='<div class="msg-avatar">🐾</div><div class="msg-bubble typing"><span></span><span></span><span></span></div>';
+  d.innerHTML='<div class="msg-avatar">&#x1F43E;</div><div class="msg-bubble typing"><span></span><span></span><span></span></div>';
   chat.appendChild(d); scrollBottom();
 }
-
 function removeTyping() { document.getElementById('typing')?.remove(); }
 
 async function ask(question) {
@@ -657,18 +753,11 @@ function toggleMic() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PWA
-// ═══════════════════════════════════════════════════════════════════════════
-let deferredPrompt=null;
-window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredPrompt=e; document.getElementById('install-banner').classList.add('show'); });
-function installApp(){ if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; document.getElementById('install-banner').classList.remove('show'); }); } }
-
-// ═══════════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 loadRota();
 if (!checkSession()) {
-  // PIN screen is visible by default, nothing to do
+  // PIN screen visible by default
 } else {
   document.getElementById('pin-screen').classList.add('hidden');
 }
