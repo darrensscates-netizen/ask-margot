@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#5C3D1E" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Ask Margot" />
+  <meta name="description" content="Ask Margot — your friendly house guide" />
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Ask Margot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brown-dark:  #3D2210;
+      --brown-mid:   #5C3D1E;
+      --brown-warm:  #8B5E3C;
+      --brown-light: #C4956A;
+      --brown-pale:  #E8D5C0;
+      --cream:       #FAF5EE;
+      --cream-dark:  #F0E8DA;
+      --gold:        #C8892A;
+      --gold-light:  #F0C060;
+      --text-dark:   #2A1A0A;
+      --text-light:  #8B7355;
+      --white:       #FFFFFF;
+      --shadow:      rgba(61,34,16,0.15);
+      --shadow-deep: rgba(61,34,16,0.3);
+      --radius:      20px;
+      --radius-sm:   12px;
+      --nav-height:  64px;
+    }
+
+    html, body { height: 100%; font-family: 'Nunito', sans-serif; background: var(--cream); color: var(--text-dark); overflow: hidden; }
+
+    /* ── PIN SCREEN ───────────────────────────────────────────── */
+    #pin-screen {
+      position: fixed; inset: 0; z-index: 1000;
+      background: linear-gradient(160deg, var(--brown-dark) 0%, var(--brown-mid) 50%, var(--brown-warm) 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 32px 24px;
+      padding-top: max(32px, env(safe-area-inset-top));
+    }
+    #pin-screen.hidden { display: none; }
+
+    .pin-dog { width: 88px; height: 88px; margin-bottom: 14px; }
+
+    .pin-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--white); margin-bottom: 6px; }
+    .pin-subtitle { font-size: 14px; color: var(--brown-pale); margin-bottom: 34px; text-align: center; line-height: 1.5; }
+
+    .pin-dots { display: flex; gap: 16px; margin-bottom: 30px; }
+    .pin-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--brown-pale); transition: all 0.15s; }
+    .pin-dot.filled { background: var(--gold-light); border-color: var(--gold-light); transform: scale(1.15); }
+
+    .pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 280px; }
+
+    .pin-btn {
+      height: 68px; border-radius: var(--radius-sm);
+      border: 2px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08);
+      color: var(--white); font-family: 'Nunito', sans-serif;
+      font-size: 24px; font-weight: 700; cursor: pointer;
+      transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pin-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.94); }
+    .pin-btn.pin-clear { font-size: 13px; font-weight: 700; color: var(--brown-pale); }
+    .pin-btn.pin-del { font-size: 20px; }
+
+    .pin-error { margin-top: 18px; color: #FF9999; font-size: 14px; font-weight: 600; min-height: 20px; animation: shake 0.35s ease; }
+    @keyframes shake { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-8px); } 60% { transform:translateX(8px); } }
+
+    /* ── APP SHELL ────────────────────────────────────────────── */
+    #app { display: flex; flex-direction: column; height: 100dvh; max-width: 600px; margin: 0 auto; background: var(--cream); }
+
+    /* ── HEADER ───────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, var(--brown-dark) 0%, var(--brown-mid) 60%, var(--brown-warm) 100%);
+      padding: 12px 18px 10px; padding-top: max(12px, env(safe-area-inset-top));
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 4px 20px var(--shadow-deep); position: relative; z-index: 10; flex-shrink: 0;
+    }
+    .header-avatar { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--gold-light); background: var(--brown-warm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+    .header-avatar svg { width: 38px; height: 38px; }
+    .header-text h1 { font-family: 'Playfair Display', serif; font-size: 19px; color: var(--white); line-height: 1.1; }
+    .header-text p { font-size: 11px; color: var(--brown-pale); font-weight: 500; margin-top: 1px; }
+    .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .status-pill { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--brown-pale); font-weight: 600; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #6BCB6B; animation: pulse 2s ease-in-out infinite; }
+    .status-dot.offline { background: #e05; animation: none; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    .btn-lock { background: none; border: none; cursor: pointer; font-size: 17px; color: var(--brown-pale); padding: 4px; transition: opacity 0.2s; }
+    .btn-lock:hover { opacity: 0.7; }
+
+    /* ── PAGES ────────────────────────────────────────────────── */
+    .page { display: none; flex: 1; flex-direction: column; overflow: hidden; min-height: 0; }
+    .page.active { display: flex; }
+
+    /* ── CHAT ─────────────────────────────────────────────────── */
+    #chat { flex: 1; overflow-y: auto; padding: 14px 13px; display: flex; flex-direction: column; gap: 11px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+    #chat::-webkit-scrollbar { width: 3px; }
+    #chat::-webkit-scrollbar-thumb { background: var(--brown-pale); border-radius: 3px; }
+
+    .welcome-card { background: linear-gradient(135deg, var(--brown-mid), var(--brown-warm)); border-radius: var(--radius); padding: 16px 15px; color: var(--white); box-shadow: 0 6px 24px var(--shadow-deep); animation: slideIn 0.4s ease; }
+    .welcome-card h2 { font-family: 'Playfair Display', serif; font-size: 17px; margin-bottom: 5px; }
+    .welcome-card p { font-size: 13px; line-height: 1.55; color: var(--brown-pale); }
+    .welcome-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
+    .chip { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: var(--white); font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 20px; cursor: pointer; transition: all 0.2s; font-family: 'Nunito', sans-serif; }
+    .chip:hover, .chip:active { background: rgba(255,255,255,0.28); }
+
+    .msg { display: flex; gap: 7px; animation: slideIn 0.3s ease; }
+    .msg.user { flex-direction: row-reverse; }
+    @keyframes slideIn { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }
+    .msg-avatar { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; margin-top: 2px; }
+    .msg.bot .msg-avatar { background: linear-gradient(135deg, var(--brown-mid), var(--brown-warm)); }
+    .msg.user .msg-avatar { background: linear-gradient(135deg, var(--gold), var(--gold-light)); }
+    .msg-bubble { max-width: calc(100% - 40px); padding: 9px 13px; border-radius: var(--radius); font-size: 14px; line-height: 1.58; font-weight: 500; }
+    .msg.bot .msg-bubble { background: var(--white); color: var(--text-dark); border-radius: 4px var(--radius) var(--radius) var(--radius); box-shadow: 0 2px 10px var(--shadow); }
+    .msg.user .msg-bubble { background: linear-gradient(135deg, var(--brown-mid), var(--brown-warm)); color: var(--white); border-radius: var(--radius) 4px var(--radius) var(--radius); }
+
+    .typing { display: flex; align-items: center; gap: 5px; padding: 11px 13px; }
+    .typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--brown-light); animation: bounce 1.2s ease-in-out infinite; }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,60%,100% { transform:translateY(0); } 30% { transform:translateY(-6px); } }
+
+    .error-msg { background: #FFF0F0; border: 1px solid #FFCCCC; color: #C00; border-radius: var(--radius-sm); padding: 9px 13px; font-size: 13px; text-align: center; }
+
+    /* ── INPUT ────────────────────────────────────────────────── */
+    #input-area { padding: 9px 13px 11px; background: var(--cream-dark); border-top: 1px solid var(--brown-pale); flex-shrink: 0; }
+    .input-row { display: flex; gap: 8px; align-items: flex-end; }
+    #question-input { flex: 1; min-height: 42px; max-height: 108px; padding: 9px 13px; border: 2px solid var(--brown-pale); border-radius: 21px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 500; color: var(--text-dark); background: var(--white); outline: none; resize: none; transition: border-color 0.2s; line-height: 1.4; }
+    #question-input:focus { border-color: var(--brown-warm); box-shadow: 0 0 0 3px rgba(139,94,60,0.12); }
+    #question-input::placeholder { color: var(--text-light); }
+    .btn-mic, .btn-send { width: 42px; height: 42px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 17px; }
+    .btn-mic { background: var(--cream); border: 2px solid var(--brown-pale); color: var(--brown-warm); }
+    .btn-mic:hover { background: var(--brown-pale); }
+    .btn-mic.recording { background: #e05050; border-color: #e05050; color: white; animation: mic-pulse 1s ease-in-out infinite; }
+    @keyframes mic-pulse { 0%,100% { transform:scale(1); box-shadow:0 0 0 0 rgba(224,80,80,0.4); } 50% { transform:scale(1.05); box-shadow:0 0 0 8px rgba(224,80,80,0); } }
+    .btn-send { background: linear-gradient(135deg, var(--brown-mid), var(--brown-warm)); color: var(--white); box-shadow: 0 3px 10px var(--shadow); }
+    .btn-send:hover { transform: scale(1.05); }
+    .btn-send:active { transform: scale(0.96); }
+    .btn-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* ── ROTA PAGE ────────────────────────────────────────────── */
+    #page-rota { flex: 1; overflow-y: auto; padding: 16px 13px 20px; -webkit-overflow-scrolling: touch; }
+    .page-title { font-family: 'Playfair Display', serif; font-size: 21px; color: var(--brown-dark); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--brown-pale); }
+    .rota-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .rota-table th { background: var(--brown-mid); color: var(--white); padding: 9px 8px; text-align: left; font-weight: 700; font-size: 12px; letter-spacing: 0.4px; }
+    .rota-table th:first-child { border-radius: 8px 0 0 0; }
+    .rota-table th:last-child { border-radius: 0 8px 0 0; }
+    .rota-table td { padding: 10px 8px; border-bottom: 1px solid var(--brown-pale); vertical-align: middle; }
+    .rota-table tr:last-child td { border-bottom: none; }
+    .rota-table tr.today { background: #FFF8EC; }
+    .rota-table tr.today td { font-weight: 700; color: var(--brown-dark); }
+    .today-badge { display: inline-block; background: var(--gold); color: var(--white); font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 8px; margin-left: 5px; letter-spacing: 0.5px; vertical-align: middle; }
+    .walker-pill { display: inline-block; background: var(--brown-pale); color: var(--brown-mid); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+
+    /* ── CONTACTS PAGE ────────────────────────────────────────── */
+    #page-contacts { flex: 1; overflow-y: auto; padding: 16px 13px 20px; -webkit-overflow-scrolling: touch; }
+    .contact-group-title { font-size: 11px; font-weight: 800; letter-spacing: 1px; color: var(--brown-light); text-transform: uppercase; margin: 16px 0 8px; padding-left: 2px; }
+    .contact-group-title:first-of-type { margin-top: 0; }
+    .contact-card { background: var(--white); border-radius: var(--radius-sm); padding: 11px 13px; margin-bottom: 7px; box-shadow: 0 2px 8px var(--shadow); display: flex; align-items: center; gap: 11px; text-decoration: none; color: inherit; transition: transform 0.15s; }
+    .contact-card:active { transform: scale(0.98); }
+    .contact-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
+    .contact-info { flex: 1; min-width: 0; }
+    .contact-name { font-weight: 700; font-size: 14px; color: var(--text-dark); }
+    .contact-role { font-size: 11px; color: var(--text-light); margin-top: 1px; }
+    .contact-number { font-size: 13px; color: var(--brown-warm); font-weight: 600; margin-top: 2px; }
+    .contact-actions { display: flex; gap: 7px; flex-shrink: 0; }
+    .btn-call, .btn-wa { width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: transform 0.15s; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+    .btn-call { background: #E8F4E8; }
+    .btn-wa { background: #E8F5E8; }
+    .btn-call:hover, .btn-wa:hover { transform: scale(1.12); }
+
+    /* ── BOTTOM NAV ───────────────────────────────────────────── */
+    #bottom-nav {
+      height: var(--nav-height);
+      padding-bottom: max(0px, env(safe-area-inset-bottom));
+      background: var(--white); border-top: 1px solid var(--brown-pale);
+      display: flex; align-items: stretch; flex-shrink: 0;
+      box-shadow: 0 -3px 14px var(--shadow);
+    }
+    .nav-btn {
+      flex: 1; border: none; background: none; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px; color: var(--text-light);
+      font-family: 'Nunito', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.2px; padding: 6px 4px; position: relative;
+      transition: color 0.2s; -webkit-tap-highlight-color: transparent;
+    }
+    .nav-icon { font-size: 21px; transition: transform 0.2s; }
+    .nav-btn.active { color: var(--brown-mid); }
+    .nav-btn.active .nav-icon { transform: translateY(-2px); }
+    .nav-btn.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 30px; height: 3px; background: var(--brown-mid); border-radius: 3px 3px 0 0; }
+
+    /* ── INSTALL BANNER ───────────────────────────────────────── */
+    #install-banner { display: none; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--brown-dark); padding: 8px 16px; font-size: 13px; font-weight: 700; text-align: center; cursor: pointer; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0; }
+    #install-banner.show { display: flex; }
+  </style>
+</head>
+<body>
+
+<!-- ── PIN SCREEN ──────────────────────────────────────────────────────────── -->
+<div id="pin-screen">
+  <svg class="pin-dog" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="256" cy="256" r="256" fill="rgba(255,255,255,0.08)"/>
+    <ellipse cx="256" cy="340" rx="130" ry="95" fill="#9B6E4C"/>
+    <ellipse cx="256" cy="210" rx="105" ry="95" fill="#B07E5A"/>
+    <ellipse cx="162" cy="228" rx="48" ry="72" fill="#7A4F28" transform="rotate(-15 162 228)"/>
+    <ellipse cx="350" cy="228" rx="48" ry="72" fill="#7A4F28" transform="rotate(15 350 228)"/>
+    <ellipse cx="256" cy="242" rx="62" ry="50" fill="#D4A574"/>
+    <ellipse cx="256" cy="218" rx="28" ry="20" fill="#2A1A0A"/>
+    <circle cx="210" cy="185" r="22" fill="#2A1A0A"/>
+    <circle cx="218" cy="179" r="8" fill="white"/>
+    <circle cx="302" cy="185" r="22" fill="#2A1A0A"/>
+    <circle cx="310" cy="179" r="8" fill="white"/>
+    <path d="M 228 262 Q 256 282 284 262" stroke="#5C3010" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="256" cy="280" rx="22" ry="18" fill="#E07070"/>
+    <rect x="178" y="288" width="156" height="22" rx="11" fill="#C8892A"/>
+    <circle cx="256" cy="299" r="14" fill="#F0C060"/>
+    <text x="256" y="305" text-anchor="middle" font-size="14" font-weight="bold" fill="#5C3D1E" font-family="Arial">M</text>
+  </svg>
+
+  <h1 class="pin-title">Ask Margot</h1>
+  <p class="pin-subtitle">Enter your PIN to access<br>the house guide</p>
+
+  <div class="pin-dots">
+    <div class="pin-dot" id="dot-0"></div>
+    <div class="pin-dot" id="dot-1"></div>
+    <div class="pin-dot" id="dot-2"></div>
+    <div class="pin-dot" id="dot-3"></div>
+  </div>
+
+  <div class="pin-pad">
+    <button class="pin-btn" onclick="pinPress('1')">1</button>
+    <button class="pin-btn" onclick="pinPress('2')">2</button>
+    <button class="pin-btn" onclick="pinPress('3')">3</button>
+    <button class="pin-btn" onclick="pinPress('4')">4</button>
+    <button class="pin-btn" onclick="pinPress('5')">5</button>
+    <button class="pin-btn" onclick="pinPress('6')">6</button>
+    <button class="pin-btn" onclick="pinPress('7')">7</button>
+    <button class="pin-btn" onclick="pinPress('8')">8</button>
+    <button class="pin-btn" onclick="pinPress('9')">9</button>
+    <button class="pin-btn pin-clear" onclick="pinClear()">Clear</button>
+    <button class="pin-btn" onclick="pinPress('0')">0</button>
+    <button class="pin-btn pin-del" onclick="pinDelete()">⌫</button>
+  </div>
+
+  <div class="pin-error" id="pin-error"></div>
+</div>
+
+<!-- ── MAIN APP ────────────────────────────────────────────────────────────── -->
+<div id="app">
+
+  <header>
+    <div class="header-avatar">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50" cy="68" rx="28" ry="22" fill="#7B4A1E"/>
+        <ellipse cx="50" cy="38" rx="22" ry="20" fill="#8B5E3C"/>
+        <ellipse cx="30" cy="44" rx="10" ry="16" fill="#6B3F1A" transform="rotate(-10 30 44)"/>
+        <ellipse cx="70" cy="44" rx="10" ry="16" fill="#6B3F1A" transform="rotate(10 70 44)"/>
+        <ellipse cx="50" cy="46" rx="13" ry="10" fill="#C4956A"/>
+        <ellipse cx="50" cy="41" rx="6" ry="4" fill="#2A1A0A"/>
+        <circle cx="40" cy="34" r="5" fill="#2A1A0A"/>
+        <circle cx="60" cy="34" r="5" fill="#2A1A0A"/>
+        <circle cx="42" cy="33" r="2" fill="white"/>
+        <circle cx="62" cy="33" r="2" fill="white"/>
+        <path d="M 44 50 Q 50 56 56 50" stroke="#5C3010" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="50" cy="55" rx="5" ry="4" fill="#E07070"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Ask Margot</h1>
+      <p>House &amp; dog guide</p>
+    </div>
+    <div class="header-right">
+      <div class="status-pill">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Ready</span>
+      </div>
+      <button class="btn-lock" onclick="lockApp()" title="Lock app">🔒</button>
+    </div>
+  </header>
+
+  <div id="install-banner" onclick="installApp()">🐾 Add to home screen for quick access</div>
+
+  <!-- CHAT PAGE -->
+  <div class="page active" id="page-chat-wrap">
+    <div id="chat">
+      <div class="welcome-card">
+        <h2>👋 Hi there!</h2>
+        <p>Ask me anything about Margot or the house. Or tap Rota and Contacts below for instant access.</p>
+        <div class="welcome-chips">
+          <button class="chip" onclick="ask('How much does Margot eat?')">🐾 Feeding</button>
+          <button class="chip" onclick="ask('What is the vet number?')">🏥 Vet</button>
+          <button class="chip" onclick="ask('When does the bin go out?')">🗑️ Bins</button>
+          <button class="chip" onclick="ask('How do I use the dishwasher?')">🍽️ Dishwasher</button>
+          <button class="chip" onclick="ask('How do I put the harness on?')">🎽 Harness</button>
+          <button class="chip" onclick="ask('What is dangerous for Margot?')">⚠️ Dangers</button>
+        </div>
+      </div>
+    </div>
+    <div id="input-area">
+      <div class="input-row">
+        <button class="btn-mic" id="mic-btn" onclick="toggleMic()" title="Speak your question">🎤</button>
+        <textarea id="question-input" placeholder="Ask anything about Margot or the house…"
+          rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="btn-send" id="send-btn" onclick="sendQuestion()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROTA PAGE -->
+  <div class="page" id="page-rota-wrap">
+    <div id="page-rota">
+      <div class="page-title">🗓️ Margot's Rota</div>
+      <table class="rota-table">
+        <thead>
+          <tr><th>Day &amp; Date</th><th>Daytime</th><th>Walker</th></tr>
+        </thead>
+        <tbody id="rota-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CONTACTS PAGE -->
+  <div class="page" id="page-contacts-wrap">
+    <div id="page-contacts">
+      <div class="page-title">📞 Contacts</div>
+
+      <div class="contact-group-title">Owners</div>
+
+      <div class="contact-card">
+        <div class="contact-avatar" style="background:#FFF0E0">👩</div>
+        <div class="contact-info">
+          <div class="contact-name">Caroline</div>
+          <div class="contact-role">Owner — WhatsApp preferred</div>
+          <div class="contact-number">07976 616359</div>
+        </div>
+        <div class="contact-actions">
+          <a class="btn-call" href="tel:07976616359" title="Call">📞</a>
+          <a class="btn-wa" href="https://wa.me/447976616359" target="_blank" title="WhatsApp">💬</a>
+        </div>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-avatar" style="background:#E8F0FF">👨</div>
+        <div class="contact-info">
+          <div class="contact-name">Darren</div>
+          <div class="contact-role">Owner — WhatsApp preferred</div>
+          <div class="contact-number">07980 224060</div>
+        </div>
+        <div class="contact-actions">
+          <a class="btn-call" href="tel:07980224060" title="Call">📞</a>
+          <a class="btn-wa" href="https://wa.me/447980224060" target="_blank" title="WhatsApp">💬</a>
+        </div>
+      </div>
+
+      <div class="contact-group-title">Dog Walkers</div>
+
+      <div class="contact-card">
+        <div class="contact-avatar" style="background:#E8F5E8">🦮</div>
+        <div class="contact-info">
+          <div class="contact-name">Claire</div>
+          <div class="contact-role">Dog walker</div>
+          <div class="contact-number">07956 395443</div>
+        </div>
+        <div class="contact-actions">
+          <a class="btn-call" href="tel:07956395443" title="Call">📞</a>
+        </div>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-avatar" style="background:#E8F5E8">🦮</div>
+        <div class="contact-info">
+          <div class="contact-name">Steve</div>
+          <div class="contact-role">Dog walker</div>
+          <div class="contact-number">07956 560222</div>
+        </div>
+        <div class="contact-actions">
+          <a class="btn-call" href="tel:07956560222" title="Call">📞</a>
+        </div>
+      </div>
+
+      <div class="contact-group-title">Neighbours</div>
+
+      <div class="contact-card">
+        <div class="contact-avatar" style="background:#F0E8FF">🏠</div>
+        <div class="contact-info">
+          <div class="contact-name">Howard</div>
+          <div class="contact-role">Next door — number 60</div>
+          <div class="contact-number">07855 777584</div>
+        </div>
+        <div class="contact-actions">
+          <a class="btn-call" href="tel:07855777584" title="Call">📞</a>
+        </div>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-avatar" style="background:#F0E8FF">🏠</div>
+        <div class="contact-info">
+          <div class="contact-name">Rosemarie</div>
+          <div class="contact-role">Nearby — 1 mile away</div>
+          <div class="contact-number">07745 130360</div>
+        </div>
+        <div class="contact-actions">
+          <a class="btn-call" href="tel:07745130360" title="Call">📞</a>
+        </div>
+      </div>
+
+      <div class="contact-group-title">Vet</div>
+
+      <div class="contact-card">
+        <div class="contact-avatar" style="background:#FFE8E8">🏥</div>
+        <div class="contact-info">
+          <div class="contact-name">Forest Vets</div>
+          <div class="contact-role">76 Hemnal Street, Epping</div>
+          <div class="contact-number">01992 575790</div>
+        </div>
+        <div class="contact-actions">
+          <a class="btn-call" href="tel:01992575790" title="Call">📞</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="bottom-nav">
+    <button class="nav-btn active" id="nav-chat" onclick="showPage('chat')">
+      <span class="nav-icon">💬</span>Ask
+    </button>
+    <button class="nav-btn" id="nav-rota" onclick="showPage('rota')">
+      <span class="nav-icon">🗓️</span>Rota
+    </button>
+    <button class="nav-btn" id="nav-contacts" onclick="showPage('contacts')">
+      <span class="nav-icon">📞</span>Contacts
+    </button>
+  </nav>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// CONFIG — edit these values
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Your Cloudflare Worker URL (set after deploying the worker)
+const WORKER_URL = 'https://margot-worker.YOUR-SUBDOMAIN.workers.dev';
+
+// Valid PINs — add as many as you like, one per house sitter if you want
+// Each person can have their own PIN, or everyone shares one
+const VALID_PINS = ['1973'];
+
+// Session length in minutes before PIN is required again
+const SESSION_MINUTES = 480; // 8 hours
+
+// Rota is loaded from rota.json — edit that file instead of this one
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PIN LOGIC
+// ═══════════════════════════════════════════════════════════════════════════
+const SESSION_KEY = 'margot_session';
+let pinBuffer = '';
+
+function checkSession() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
+    return s && Date.now() < s.expires;
+  } catch { return false; }
+}
+
+function saveSession() {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ expires: Date.now() + SESSION_MINUTES * 60000 }));
+}
+
+function lockApp() {
+  sessionStorage.removeItem(SESSION_KEY);
+  pinBuffer = ''; updateDots();
+  document.getElementById('pin-error').textContent = '';
+  document.getElementById('pin-screen').classList.remove('hidden');
+}
+
+function pinPress(d) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += d; updateDots();
+  if (pinBuffer.length === 4) setTimeout(checkPin, 120);
+}
+
+function pinDelete() { pinBuffer = pinBuffer.slice(0,-1); updateDots(); document.getElementById('pin-error').textContent = ''; }
+function pinClear()  { pinBuffer = ''; updateDots(); document.getElementById('pin-error').textContent = ''; }
+
+function updateDots() {
+  for (let i = 0; i < 4; i++)
+    document.getElementById('dot-' + i).classList.toggle('filled', i < pinBuffer.length);
+}
+
+function checkPin() {
+  if (VALID_PINS.includes(pinBuffer)) {
+    saveSession();
+    document.getElementById('pin-screen').classList.add('hidden');
+    document.getElementById('pin-error').textContent = '';
+    pinBuffer = ''; updateDots();
+  } else {
+    document.getElementById('pin-error').textContent = 'Incorrect PIN — please try again';
+    pinBuffer = ''; updateDots();
+  }
+}
+
+// Keyboard support
+document.addEventListener('keydown', e => {
+  if (document.getElementById('pin-screen').classList.contains('hidden')) return;
+  if (e.key >= '0' && e.key <= '9') pinPress(e.key);
+  else if (e.key === 'Backspace') pinDelete();
+  else if (e.key === 'Escape') pinClear();
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PAGE NAVIGATION
+// ═══════════════════════════════════════════════════════════════════════════
+function showPage(name) {
+  ['chat','rota','contacts'].forEach(p => {
+    document.getElementById('page-' + p + '-wrap').classList.toggle('active', p === name);
+    document.getElementById('nav-' + p).classList.toggle('active', p === name);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ROTA
+// ═══════════════════════════════════════════════════════════════════════════
+function renderRota(rows) {
+  const today = new Date().toISOString().slice(0,10);
+  const tbody = document.getElementById('rota-body');
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const isToday = r.date === today;
+    const tr = document.createElement('tr');
+    if (isToday) tr.className = 'today';
+    tr.innerHTML = `
+      <td>${r.day}${isToday ? '<span class="today-badge">TODAY</span>' : ''}</td>
+      <td>${r.daytime}</td>
+      <td><span class="walker-pill">${r.walker}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  const todayRow = tbody.querySelector('tr.today');
+  if (todayRow) setTimeout(() => todayRow.scrollIntoView({ block:'center', behavior:'smooth' }), 200);
+}
+
+function rotaError() {
+  document.getElementById('rota-body').innerHTML =
+    '<tr><td colspan="3" style="text-align:center;padding:20px;color:#8B7355">Could not load rota. Please check rota.json.</td></tr>';
+}
+
+async function loadRota() {
+  try {
+    const res = await fetch('rota.json');
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    renderRota(data.rota || []);
+  } catch(e) {
+    console.error('Rota load error:', e);
+    rotaError();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════════════════════════════════════════
+let history = [], isLoading = false, recognition = null, isRecording = false;
+
+function setStatus(t, ok=true) {
+  document.getElementById('status-text').textContent = t;
+  document.getElementById('status-dot').className = 'status-dot' + (ok ? '' : ' offline');
+}
+
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,108)+'px'; }
+
+function scrollBottom() { setTimeout(()=>document.getElementById('chat').scrollTo({top:99999,behavior:'smooth'}),50); }
+
+function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function addMsg(role, text) {
+  const chat = document.getElementById('chat');
+  const d = document.createElement('div');
+  d.className = `msg ${role}`;
+  d.innerHTML = `<div class="msg-avatar">${role==='bot'?'🐾':'👤'}</div><div class="msg-bubble">${esc(text)}</div>`;
+  chat.appendChild(d); scrollBottom();
+}
+
+function showTyping() {
+  const chat = document.getElementById('chat');
+  const d = document.createElement('div');
+  d.className='msg bot'; d.id='typing';
+  d.innerHTML='<div class="msg-avatar">🐾</div><div class="msg-bubble typing"><span></span><span></span><span></span></div>';
+  chat.appendChild(d); scrollBottom();
+}
+
+function removeTyping() { document.getElementById('typing')?.remove(); }
+
+async function ask(question) {
+  if (!question || isLoading) return;
+  showPage('chat');
+  document.getElementById('question-input').value='';
+  document.getElementById('question-input').style.height='auto';
+  addMsg('user', question);
+  history.push({ role:'user', content:question });
+  isLoading=true; document.getElementById('send-btn').disabled=true; setStatus('Thinking…');
+  showTyping();
+  try {
+    const res = await fetch(WORKER_URL, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ question, history: history.slice(-6) })
+    });
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    const answer = data.answer || 'Sorry, no response.';
+    removeTyping(); addMsg('bot', answer);
+    history.push({ role:'assistant', content:answer });
+    setStatus('Ready');
+  } catch(e) {
+    removeTyping();
+    const errDiv = document.createElement('div');
+    errDiv.className='error-msg'; errDiv.textContent='Could not reach the guide. Check your connection and try again.';
+    document.getElementById('chat').appendChild(errDiv); scrollBottom();
+    setStatus('Error', false); history.pop();
+  } finally { isLoading=false; document.getElementById('send-btn').disabled=false; }
+}
+
+function sendQuestion() { const q=document.getElementById('question-input').value.trim(); if(q) ask(q); }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendQuestion(); } }
+
+function toggleMic() {
+  if(!('webkitSpeechRecognition'in window)&&!('SpeechRecognition'in window)){ alert('Speech not supported. Try Chrome or Safari.'); return; }
+  if(isRecording){ recognition?.stop(); return; }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR(); recognition.lang='en-GB'; recognition.continuous=false; recognition.interimResults=true;
+  const mic=document.getElementById('mic-btn'); const inp=document.getElementById('question-input');
+  recognition.onstart=()=>{ isRecording=true; mic.classList.add('recording'); mic.textContent='⏹'; setStatus('Listening…'); };
+  recognition.onresult=e=>{ inp.value=Array.from(e.results).map(r=>r[0].transcript).join(''); autoResize(inp); };
+  recognition.onend=()=>{ isRecording=false; mic.classList.remove('recording'); mic.textContent='🎤'; setStatus('Ready'); if(inp.value.trim()) sendQuestion(); };
+  recognition.onerror=()=>{ isRecording=false; mic.classList.remove('recording'); mic.textContent='🎤'; setStatus('Ready'); };
+  recognition.start();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PWA
+// ═══════════════════════════════════════════════════════════════════════════
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredPrompt=e; document.getElementById('install-banner').classList.add('show'); });
+function installApp(){ if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; document.getElementById('install-banner').classList.remove('show'); }); } }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+loadRota();
+if (!checkSession()) {
+  // PIN screen is visible by default, nothing to do
+} else {
+  document.getElementById('pin-screen').classList.add('hidden');
+}
+</script>
+</body>
+</html>

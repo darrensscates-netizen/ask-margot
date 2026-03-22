@@ -1,0 +1,19 @@
+{
+  "rota": [
+    { "date": "2026-04-04", "day": "Sat 4 Apr",  "daytime": "Rosie",      "walker": "Rosie"        },
+    { "date": "2026-04-05", "day": "Sun 5 Apr",  "daytime": "Rosie",      "walker": "Rosie"        },
+    { "date": "2026-04-06", "day": "Mon 6 Apr",  "daytime": "Rosie",      "walker": "Rosie"        },
+    { "date": "2026-04-07", "day": "Tue 7 Apr",  "daytime": "Rosemarie",  "walker": "Claire 10:30" },
+    { "date": "2026-04-08", "day": "Wed 8 Apr",  "daytime": "Rosemarie",  "walker": "Claire 12:00" },
+    { "date": "2026-04-09", "day": "Thu 9 Apr",  "daytime": "Rosemarie",  "walker": "Claire 14:30" },
+    { "date": "2026-04-10", "day": "Fri 10 Apr", "daytime": "Rosie",      "walker": "Claire 12:00" },
+    { "date": "2026-04-11", "day": "Sat 11 Apr", "daytime": "Rosie",      "walker": "Rosie"        },
+    { "date": "2026-04-12", "day": "Sun 12 Apr", "daytime": "Rosie",      "walker": "Rosie"        },
+    { "date": "2026-04-13", "day": "Mon 13 Apr", "daytime": "Rosemarie",  "walker": "Claire 13:30" },
+    { "date": "2026-04-14", "day": "Tue 14 Apr", "daytime": "Rosemarie",  "walker": "Claire 10:30" },
+    { "date": "2026-04-15", "day": "Wed 15 Apr", "daytime": "Rosemarie",  "walker": "Claire 12:00" },
+    { "date": "2026-04-16", "day": "Thu 16 Apr", "daytime": "Rosemarie",  "walker": "Claire 14:30" },
+    { "date": "2026-04-17", "day": "Fri 17 Apr", "daytime": "Rosie",      "walker": "Steve 10:00"  },
+    { "date": "2026-04-18", "day": "Sat 18 Apr", "daytime": "Rosie",      "walker": "Rosie"        }
+  ]
+}
